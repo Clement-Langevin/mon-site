@@ -105,26 +105,6 @@
 
   .defilement { position: absolute; bottom: 30px; left: 40px; font-size: .7rem; color: var(--gris); letter-spacing: 3px; z-index: 2; }
 
-  /* ---------- FLASH APERÇU ---------- */
-  .flash-zone {
-    position: absolute; top: 0; right: 0; width: 55%; height: 100%;
-    pointer-events: none; z-index: 1; overflow: hidden;
-  }
-  .flash {
-    position: absolute; width: 260px; aspect-ratio: 4/5; object-fit: cover;
-    border: 1px solid var(--neon); opacity: 0;
-    filter: saturate(1.4) contrast(1.15);
-    box-shadow: 0 0 30px rgba(0,240,255,.35);
-    animation: flash-anim 0.9s steps(4) forwards;
-  }
-  @keyframes flash-anim {
-    0%   { opacity: 0; transform: translate(0,0) scale(.96); }
-    15%  { opacity: 1; transform: translate(-4px,2px) scale(1); }
-    30%  { opacity: .4; transform: translate(5px,-3px) scale(1); }
-    45%  { opacity: 1; transform: translate(0,0) scale(1); }
-    100% { opacity: 0; transform: translate(0,0) scale(1.02); }
-  }
-
   /* ---------- SECTIONS ---------- */
   section { padding: 120px 40px; position: relative; }
   .entete {
@@ -221,7 +201,6 @@
     .lb-contenu { padding: 80px 20px 40px; }
     .lb-texte { position: static; }
     footer { flex-direction: column; gap: 10px; }
-    .flash { width: 160px; }
   }
 </style>
 
@@ -244,7 +223,6 @@
 <!-- HERO -->
 <header class="hero">
   <canvas id="fond-canvas"></canvas>
-  <div class="flash-zone" id="flash-zone"></div>
   <div class="hero-contenu">
     <div class="tag">Créateur numérique</div>
     <h1 class="glitch" data-texte="Clément Langevin">Clément Langevin</h1>
@@ -409,7 +387,6 @@
         <div class="infos"><h3>${p.titre}</h3><span class="date">${p.date || ""}</span></div>
       </div>`;
     }).join("");
-    lancerFlashs();
   }
 
   function ouvrir(i) {
@@ -433,36 +410,6 @@
     document.body.style.overflow = "";
   }
   document.addEventListener("keydown", e => { if (e.key === "Escape") fermerProjet(); });
-
-  // ---------- APERÇUS ALÉATOIRES (flash dans le hero) ----------
-  let flashsLances = false;
-  function lancerFlashs() {
-    if (flashsLances) return;
-    const zone = document.getElementById("flash-zone");
-    if (!zone) return;
-    flashsLances = true;
-
-    function flashAleatoire() {
-      // on ne garde que les images (ni vidéos fichiers, ni YouTube)
-      const images = projets
-        .map(p => medias(p)[0])
-        .filter(m => m && !estVideo(m) && !estYoutube(m));
-
-      if (images.length) {
-        const src = images[Math.floor(Math.random() * images.length)];
-        const img = document.createElement("img");
-        img.src = src;
-        img.className = "flash";
-        img.style.left = (Math.random() * 60) + "%";
-        img.style.top = (Math.random() * 70) + "%";
-        img.style.transform = `rotate(${(Math.random() - .5) * 10}deg)`;
-        zone.appendChild(img);
-        setTimeout(() => img.remove(), 950);
-      }
-      setTimeout(flashAleatoire, 300 + Math.random() * 900);
-    }
-    flashAleatoire();
-  }
 </script>
 
 <!-- Redirection après connexion -->
