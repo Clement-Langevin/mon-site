@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clément Langevin — Créateur numérique</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07070a;
+    --bg2: #0e0e14;
+    --texte: #e8e8ee;
+    --gris: #7a7a8c;
+    --ligne: #1f1f2b;
+    --neon: #00f0ff;
+    --neon2: #ff2bd6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Space Mono', monospace;
+    background: var(--bg);
+    color: var(--texte);
+    line-height: 1.7;
+    font-size: 14px;
+    overflow-x: hidden;
+    cursor: none;
+  }
+  a { color: inherit; text-decoration: none; cursor: none; }
+
+  /* ---------- GRAIN + SCANLINES ---------- */
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 999;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 3px);
+    mix-blend-mode: overlay;
+  }
+  body::after {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 998;
+    background: radial-gradient(circle at 50% 50%, transparent 55%, rgba(0,0,0,.55) 100%);
+  }
+
+  /* ---------- CURSEUR LUMINEUX ---------- */
+  #curseur {
+    position: fixed; width: 14px; height: 14px; border-radius: 50%;
+    background: var(--neon); pointer-events: none; z-index: 1000;
+    transform: translate(-50%,-50%);
+    box-shadow: 0 0 20px var(--neon), 0 0 50px var(--neon);
+    mix-blend-mode: screen;
+    transition: width .2s, height .2s, background .2s;
+  }
+  #curseur.actif { width: 46px; height: 46px; background: var(--neon2); box-shadow: 0 0 30px var(--neon2), 0 0 70px var(--neon2); }
+
+  /* ---------- NAV ---------- */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px 40px;
+    background: linear-gradient(var(--bg), transparent);
+  }
+  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; letter-spacing: 2px; }
+  .logo span { color: var(--neon); }
+  nav ul { display: flex; gap: 32px; list-style: none; }
+  nav ul a { font-size: .75rem; letter-spacing: 2px; text-transform: uppercase; color: var(--gris); transition: color .2s; }
+  nav ul a::before { content: "// "; color: var(--neon); opacity: 0; transition: opacity .2s; }
+  nav ul a:hover { color: var(--texte); }
+  nav ul a:hover::before { opacity: 1; }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    min-height: 100vh; position: relative;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 120px 40px 60px;
+    overflow: hidden;
+  }
+  #fond-canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .55; }
+  .hero-contenu { position: relative; z-index: 2; max-width: 1200px; }
+  .tag { color: var(--neon); font-size: .75rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 24px; }
+  .tag::before { content: "> "; }
+  .tag::after { content: "_"; animation: clignote 1s steps(1) infinite; }
+  @keyframes clignote { 50% { opacity: 0; } }
+
+  .glitch {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: clamp(2rem, 6.5vw, 5.5rem);
+    line-height: 1; text-transform: uppercase;
+    position: relative; display: inline-block;
+  }
+  .glitch::before, .glitch::after {
+    content: attr(data-texte); position: absolute; left: 0; top: 0; width: 100%;
+    overflow: hidden;
+  }
+  .glitch::before { color: var(--neon); transform: translate(-3px,0); clip-path: inset(0 0 60% 0); animation: gl1 3s infinite steps(1); mix-blend-mode: screen; }
+  .glitch::after  { color: var(--neon2); transform: translate(3px,0); clip-path: inset(60% 0 0 0); animation: gl2 2.4s infinite steps(1); mix-blend-mode: screen; }
+  @keyframes gl1 { 0%,90%,100% { transform: translate(0); } 92% { transform: translate(-6px,2px); } 95% { transform: translate(5px,-2px); } }
+  @keyframes gl2 { 0%,85%,100% { transform: translate(0); } 87% { transform: translate(6px,-2px); } 93% { transform: translate(-5px,3px); } }
+
+  .hero p.intro { margin-top: 36px; max-width: 520px; color: var(--gris); }
+  .btn-lien {
+    display: inline-block; margin-top: 36px; padding: 14px 28px;
+    border: 1px solid var(--neon); color: var(--neon);
+    font-size: .75rem; letter-spacing: 3px; text-transform: uppercase;
+    transition: all .25s;
+  }
+  .btn-lien:hover { background: var(--neon); color: var(--bg); box-shadow: 0 0 30px var(--neon); }
+
+  .defilement { position: absolute; bottom: 30px; left: 40px; font-size: .7rem; color: var(--gris); letter-spacing: 3px; z-index: 2; }
+
+  /* ---------- SECTIONS ---------- */
+  section { padding: 120px 40px; position: relative; }
+  .entete {
+    display: flex; justify-content: space-between; align-items: baseline;
+    border-bottom: 1px solid var(--ligne); padding-bottom: 20px; margin-bottom: 60px;
+  }
+  .entete h2 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(1.8rem, 4vw, 3rem); text-transform: uppercase; }
+  .entete .num { color: var(--neon); font-size: .8rem; letter-spacing: 3px; }
+
+  /* ---------- GRILLE PROJETS ---------- */
+  .grille {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 28px;
+    max-width: 1400px; margin: 0 auto;
+  }
+  .projet { position: relative; cursor: none; }
+  .projet .cadre {
+    aspect-ratio: 4/5; background: var(--bg2); overflow: hidden; position: relative;
+    border: 1px solid var(--ligne); transition: border-color .3s, box-shadow .3s;
+  }
+  .projet:hover .cadre { border-color: var(--neon); box-shadow: 0 0 30px rgba(0,240,255,.25); }
+  .projet .cadre img, .projet .cadre video {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform .8s ease, filter .4s;
+    filter: saturate(.85) contrast(1.05);
+  }
+  .projet:hover .cadre img, .projet:hover .cadre video { transform: scale(1.06); filter: saturate(1.3) contrast(1.1); }
+  .projet .cadre::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 1px, transparent 1px 3px);
+    opacity: 0; transition: opacity .3s;
+  }
+  .projet:hover .cadre::after { opacity: 1; }
+  .projet .coin { position: absolute; top: 12px; left: 12px; font-size: .65rem; color: var(--neon); letter-spacing: 2px; z-index: 2; text-shadow: 0 0 8px #000; }
+  .projet .video-tag { position: absolute; top: 12px; right: 12px; font-size: .62rem; padding: 3px 8px; background: var(--neon2); color: #000; letter-spacing: 2px; z-index: 2; }
+  .projet .infos { padding-top: 14px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .projet h3 { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 1.15rem; text-transform: uppercase; }
+  .projet .date { font-size: .7rem; color: var(--gris); white-space: nowrap; }
+  .message { color: var(--gris); grid-column: 1/-1; text-align: center; padding: 60px 0; }
+
+  /* ---------- À PROPOS ---------- */
+  #apropos { background: var(--bg2); }
+  .apropos-grille { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1.4fr; gap: 60px; }
+  .apropos-grille .gauche { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 1.6rem; line-height: 1.3; }
+  .apropos-grille .gauche em { color: var(--neon); font-style: normal; }
+  details { border-top: 1px solid var(--ligne); padding: 20px 0; }
+  details:last-child { border-bottom: 1px solid var(--ligne); }
+  summary {
+    list-style: none; cursor: none; display: flex; justify-content: space-between;
+    font-family: 'Syne', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "[+]"; color: var(--neon); font-family: 'Space Mono', monospace; font-weight: 400; }
+  details[open] summary::after { content: "[–]"; }
+  details p, details li { color: var(--gris); margin-top: 14px; }
+  details ul { list-style: none; }
+  details li::before { content: "› "; color: var(--neon2); }
+
+  /* ---------- CONTACT ---------- */
+  #contact { text-align: center; }
+  #contact .gros {
+    font-family: 'Syne', sans-serif; font-weight: 800; text-transform: uppercase;
+    font-size: clamp(1.8rem, 6vw, 4.5rem); line-height: 1.05; margin-bottom: 36px;
+  }
+  #contact .gros span { color: var(--neon); }
+  #contact a.mail { font-size: 1.1rem; color: var(--neon); border-bottom: 1px solid var(--neon); padding-bottom: 3px; }
+  #contact a.mail:hover { text-shadow: 0 0 15px var(--neon); }
+
+  footer { border-top: 1px solid var(--ligne); padding: 26px 40px; display: flex; justify-content: space-between; font-size: .72rem; color: var(--gris); letter-spacing: 1px; }
+  footer a { color: var(--gris); transition: color .2s; }
+  footer a:hover { color: var(--neon); }
+
+  /* ---------- FENÊTRE PROJET ---------- */
+  #lightbox { display: none; position: fixed; inset: 0; background: rgba(5,5,8,.97); z-index: 100; overflow-y: auto; }
+  #lightbox.ouvert { display: block; animation: apparait .35s ease; }
+  @keyframes apparait { from { opacity: 0; transform: scale(1.02); } }
+  .lb-fermer { position: fixed; top: 24px; right: 40px; z-index: 101; font-size: .75rem; letter-spacing: 3px; color: var(--neon); cursor: none; }
+  .lb-fermer:hover { text-shadow: 0 0 12px var(--neon); }
+  .lb-contenu { max-width: 1300px; margin: 0 auto; padding: 90px 40px 60px; display: grid; grid-template-columns: 1.6fr 1fr; gap: 50px; align-items: start; }
+  .lb-media img, .lb-media video { width: 100%; max-height: 82vh; object-fit: contain; border: 1px solid var(--ligne); background: #000; }
+  .lb-texte .meta { color: var(--neon); font-size: .72rem; letter-spacing: 3px; text-transform: uppercase; }
+  .lb-texte h2 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(1.8rem, 3.5vw, 3rem); text-transform: uppercase; line-height: 1; margin: 14px 0 24px; }
+  .lb-texte p { color: var(--gris); white-space: pre-line; }
+
+  @media (max-width: 800px) {
+    body, a, summary, .projet, .lb-fermer { cursor: auto; }
+    #curseur { display: none; }
+    nav { padding: 16px 20px; }
+    nav ul { gap: 14px; }
+    section, .hero { padding-left: 20px; padding-right: 20px; }
+    .apropos-grille, .lb-contenu { grid-template-columns: 1fr; gap: 30px; }
+    .lb-contenu { padding: 80px 20px 40px; }
+    footer { flex-direction: column; gap: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="curseur"></div>
+
+<nav>
+  <a href="#" class="logo">CLÉMENT<span>_</span>LANGEVIN</a>
+  <ul>
+    <li><a href="#projets">Projets</a></li>
+    <li><a href="#apropos">À propos</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <canvas id="fond-canvas"></canvas>
+  <div class="hero-contenu">
+    <div class="tag">Créateur numérique</div>
+    <h1 class="glitch" data-texte="Clément Langevin">Clément Langevin</h1>
+    <p class="intro">Texte de présentation provisoire. J'explore les frontières entre le code, l'image et la perception. Des projets numériques nés de pixels, de bruit et de lumière.</p>
+    <a href="#projets" class="btn-lien">Explorer les projets</a>
+  </div>
+  <div class="defilement">SCROLL ↓</div>
+</header>
+
+<!-- PROJETS -->
+<section id="projets">
+  <div class="entete"><h2>Projets</h2><span class="num">01 / ARCHIVE</span></div>
+  <div class="grille" id="grille"><p class="message">// chargement...</p></div>
+</section>
+
+<!-- À PROPOS -->
+<section id="apropos">
+  <div class="entete"><h2>À propos</h2><span class="num">02 / PROFIL</span></div>
+  <div class="apropos-grille">
+    <div class="gauche">Créateur numérique, <em>entre code</em> et esthétique.</div>
+    <div>
+      <details open>
+        <summary>Biographie</summary>
+        <p>Clément Langevin crée des projets numériques à la croisée du code et de l'image. (Texte provisoire.)</p>
+      </details>
+      <details>
+        <summary>Démarche</summary>
+        <p>Je m'intéresse aux systèmes, aux glitchs et à la poésie des erreurs numériques. (Texte provisoire.)</p>
+      </details>
+      <details>
+        <summary>Expositions</summary>
+        <ul>
+          <li>2026 — Exposition personnelle, Galerie exemple, Paris</li>
+          <li>2025 — Festival d'art numérique, Ville exemple</li>
+          <li>2024 — Exposition collective, Lieu exemple</li>
+        </ul>
+      </details>
+      <details>
+        <summary>Outils</summary>
+        <p>TouchDesigner · Blender · p5.js · Processing · After Effects · Python</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="gros">Créons quelque chose<br>de <span>nouveau</span></div>
+  <a class="mail" href="mailto:contact@exemple.com">contact@exemple.com</a>
+</section>
+
+<footer>
+  <span>© 2026 CLÉMENT LANGEVIN</span>
+  <a href="/admin/">[ ACCÈS ARTISTE ]</a>
+</footer>
+
+<!-- FENÊTRE PROJET -->
+<div id="lightbox">
+  <span class="lb-fermer" onclick="fermerProjet()">[ FERMER ✕ ]</span>
+  <div class="lb-contenu" id="lb-contenu"></div>
+</div>
+
+<script>
+  // ---------- CURSEUR ----------
+  const curseur = document.getElementById("curseur");
+  document.addEventListener("mousemove", e => {
+    curseur.style.left = e.clientX + "px";
+    curseur.style.top = e.clientY + "px";
+  });
+  document.addEventListener("mouseover", e => {
+    curseur.classList.toggle("actif", !!e.target.closest("a, .projet, summary, .lb-fermer"));
+  });
+
+  // ---------- FOND ANIMÉ (particules + lignes) ----------
+  const canvas = document.getElementById("fond-canvas");
+  const ctx = canvas.getContext("2d");
+  let pts = [], souris = { x: -999, y: -999 };
+  function redim() {
+    canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
+    pts = Array.from({ length: Math.min(90, canvas.width / 16) }, () => ({
+      x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+      vx: (Math.random() - .5) * .5, vy: (Math.random() - .5) * .5
+    }));
+  }
+  window.addEventListener("resize", redim); redim();
+  canvas.parentElement.addEventListener("mousemove", e => {
+    const r = canvas.getBoundingClientRect(); souris = { x: e.clientX - r.left, y: e.clientY - r.top };
+  });
+  function anime() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const p of pts) {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+      if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+      ctx.fillStyle = "rgba(0,240,255,.8)"; ctx.fillRect(p.x, p.y, 2, 2);
+    }
+    for (let i = 0; i < pts.length; i++) {
+      for (let j = i + 1; j < pts.length; j++) {
+        const d = Math.hypot(pts[i].x - pts[j].x, pts[i].y - pts[j].y);
+        if (d < 120) { ctx.strokeStyle = `rgba(0,240,255,${.25 - d / 480})`; ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y); ctx.stroke(); }
+      }
+      const dm = Math.hypot(pts[i].x - souris.x, pts[i].y - souris.y);
+      if (dm < 160) { ctx.strokeStyle = `rgba(255,43,214,${.5 - dm / 320})`; ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(souris.x, souris.y); ctx.stroke(); }
+    }
+    requestAnimationFrame(anime);
+  }
+  anime();
+
+  // ---------- PROJETS (chargés depuis projets.json) ----------
+  let projets = [];
+  const estVideo = f => /\.(mp4|webm|mov)$/i.test(f);
+
+  fetch("projets.json")
+    .then(r => r.json())
+    .then(data => { projets = data.projets || []; afficher(); })
+    .catch(() => { document.getElementById("grille").innerHTML = '<p class="message">// aucun projet pour le moment</p>'; });
+
+  function afficher() {
+    const g = document.getElementById("grille");
+    if (!projets.length) { g.innerHTML = '<p class="message">// aucun projet pour le moment</p>'; return; }
+    g.innerHTML = projets.map((p, i) => `
+      <div class="projet" onclick="ouvrir(${i})">
+        <div class="cadre">
+          <span class="coin">N°${String(projets.length - i).padStart(2, "0")}</span>
+          ${estVideo(p.media) ? '<span class="video-tag">VIDÉO</span>' : ""}
+          ${estVideo(p.media) ? `<video src="${p.media}" muted loop onmouseover="this.play()" onmouseout="this.pause()"></video>` : `<img src="${p.media}" alt="${p.titre}">`}
+        </div>
+        <div class="infos"><h3>${p.titre}</h3><span class="date">${p.date || ""}</span></div>
+      </div>`).join("");
+  }
+
+  function ouvrir(i) {
+    const p = projets[i];
+    document.getElementById("lb-contenu").innerHTML = `
+      <div class="lb-media">${estVideo(p.media) ? `<video src="${p.media}" controls autoplay loop></video>` : `<img src="${p.media}" alt="${p.titre}">`}</div>
+      <div class="lb-texte">
+        <div class="meta">${p.date || ""}</div>
+        <h2>${p.titre}</h2>
+        <p>${p.description || ""}</p>
+      </div>`;
+    document.getElementById("lightbox").classList.add("ouvert");
+    document.body.style.overflow = "hidden";
+  }
+  function fermerProjet() {
+    document.getElementById("lightbox").classList.remove("ouvert");
+    document.getElementById("lb-contenu").innerHTML = "";
+    document.body.style.overflow = "";
+  }
+  document.addEventListener("keydown", e => { if (e.key === "Escape") fermerProjet(); });
+</script>
+</body>
+</html>

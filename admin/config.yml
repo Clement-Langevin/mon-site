@@ -1,0 +1,23 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "images/uploads"
+public_folder: "/images/uploads"
+
+collections:
+  - name: "projets"
+    label: "Projets"
+    files:
+      - file: "projets.json"
+        label: "Liste des projets"
+        name: "liste"
+        fields:
+          - label: "Projets"
+            name: "projets"
+            widget: "list"
+            fields:
+              - { label: "Titre", name: "titre", widget: "string" }
+              - { label: "Date", name: "date", widget: "string", hint: "Ex : Mars 2026" }
+              - { label: "Média (photo ou vidéo)", name: "media", widget: "file" }
+              - { label: "Description", name: "description", widget: "text", required: false }
