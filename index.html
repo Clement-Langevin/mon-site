@@ -199,6 +199,9 @@
     footer { flex-direction: column; gap: 10px; }
   }
 </style>
+
+<!-- AJOUT 1 : Netlify Identity -->
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
 
@@ -365,6 +368,19 @@
     document.body.style.overflow = "";
   }
   document.addEventListener("keydown", e => { if (e.key === "Escape") fermerProjet(); });
+</script>
+
+<!-- AJOUT 2 : redirection après connexion -->
+<script>
+  if (window.netlifyIdentity) {
+    window.netlifyIdentity.on("init", user => {
+      if (!user) {
+        window.netlifyIdentity.on("login", () => {
+          document.location.href = "/admin/";
+        });
+      }
+    });
+  }
 </script>
 </body>
 </html>
