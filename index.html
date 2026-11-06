@@ -191,16 +191,38 @@
   .lb-texte h2 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(1.8rem, 3.5vw, 3rem); text-transform: uppercase; line-height: 1; margin: 14px 0 24px; }
   .lb-texte p { color: var(--gris); white-space: pre-line; }
 
+  /* ---------- MOBILE ---------- */
   @media (max-width: 800px) {
     body, a, summary, .projet, .lb-fermer { cursor: auto; }
     #curseur { display: none; }
-    nav { padding: 16px 20px; }
-    nav ul { gap: 14px; }
     section, .hero { padding-left: 20px; padding-right: 20px; }
     .apropos-grille, .lb-contenu { grid-template-columns: 1fr; gap: 30px; }
     .lb-contenu { padding: 80px 20px 40px; }
     .lb-texte { position: static; }
     footer { flex-direction: column; gap: 10px; }
+
+    nav {
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+    }
+    .logo { font-size: .95rem; letter-spacing: 1px; }
+    nav ul {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 18px;
+      margin: 0;
+      padding: 0;
+    }
+    nav ul a { font-size: .68rem; letter-spacing: 1.5px; white-space: nowrap; }
+  }
+
+  @media (max-width: 420px) {
+    .logo { font-size: .85rem; }
+    nav ul { gap: 12px; }
+    nav ul a { font-size: .62rem; letter-spacing: 1px; }
   }
 </style>
 
