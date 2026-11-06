@@ -125,8 +125,8 @@
     border: 1px solid var(--ligne); transition: border-color .3s, box-shadow .3s;
   }
   .projet:hover .cadre { border-color: var(--neon); box-shadow: 0 0 30px rgba(0,240,255,.25); }
-  .projet .cadre img, .projet .cadre video {
-    width: 100%; height: 100%; object-fit: cover;
+  .projet .cadre img, .projet .cadre video, .projet .cadre iframe {
+    width: 100%; height: 100%; object-fit: cover; border: 0; display: block;
     transition: transform .8s ease, filter .4s;
     filter: saturate(.85) contrast(1.05);
   }
@@ -184,7 +184,8 @@
   .lb-fermer:hover { text-shadow: 0 0 12px var(--neon); }
   .lb-contenu { max-width: 1300px; margin: 0 auto; padding: 90px 40px 60px; display: grid; grid-template-columns: 1.6fr 1fr; gap: 50px; align-items: start; }
   .lb-media { display: flex; flex-direction: column; gap: 24px; }
-  .lb-item img, .lb-item video { width: 100%; height: auto; display: block; border: 1px solid var(--ligne); background: #000; }
+  .lb-item img, .lb-item video, .lb-item iframe { width: 100%; height: auto; display: block; border: 1px solid var(--ligne); background: #000; }
+  .lb-item iframe { aspect-ratio: 16/9; }
   .lb-texte { position: sticky; top: 90px; }
   .lb-texte .meta { color: var(--neon); font-size: .72rem; letter-spacing: 3px; text-transform: uppercase; }
   .lb-texte h2 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(1.8rem, 3.5vw, 3rem); text-transform: uppercase; line-height: 1; margin: 14px 0 24px; }
@@ -333,12 +334,34 @@
   // ---------- PROJETS (chargés depuis projets.json) ----------
   let projets = [];
   const estVideo = f => /\.(mp4|webm|mov)$/i.test(f || "");
+  const estYoutube = u => /(youtube\.com|youtu\.be)/i.test(u || "");
 
   // Liste des médias d'un projet (compatible ancien format "media")
   function medias(p) {
     if (Array.isArray(p.medias) && p.medias.length) return p.medias;
     if (p.media) return [p.media];
     return [];
+  }
+
+  // Convertit un lien YouTube en lien d'intégration
+  function urlYoutube(u) {
+    const m1 = u.match(/youtu\.be\/([\w-]{11})/);
+    const m2 = u.match(/[?&]v=([\w-]{11})/);
+    const m3 = u.match(/youtube\.com\/(?:embed|shorts)\/([\w-]{11})/);
+    const id = (m1 || m2 || m3 || [])[1];
+    return id ? `https://www.youtube.com/embed/${id}` : u;
+  }
+
+  // Rend un média : YouTube, vidéo fichier ou image
+  function renduMedia(m, titre, controles = false) {
+    if (estYoutube(m)) {
+      return `<iframe src="${urlYoutube(m)}" allowfullscreen></iframe>`;
+    }
+    if (estVideo(m)) {
+      return `<video src="${m}" ${controles ? "controls" : "muted loop"}
+              ${controles ? "" : 'onmouseover="this.play()" onmouseout="this.pause()"'}></video>`;
+    }
+    return `<img src="${m}" alt="${titre}">`;
   }
 
   fetch("projets.json")
@@ -351,14 +374,15 @@
     if (!projets.length) { g.innerHTML = '<p class="message">// aucun projet pour le moment</p>'; return; }
     g.innerHTML = projets.map((p, i) => {
       const m = medias(p)[0] || "";
+      let tag = "";
+      if (estYoutube(m)) tag = '<span class="video-tag">YOUTUBE</span>';
+      else if (estVideo(m)) tag = '<span class="video-tag">VIDÉO</span>';
       return `
       <div class="projet" onclick="ouvrir(${i})">
         <div class="cadre">
           <span class="coin">N°${String(projets.length - i).padStart(2, "0")}</span>
-          ${estVideo(m) ? '<span class="video-tag">VIDÉO</span>' : ""}
-          ${estVideo(m)
-            ? `<video src="${m}" muted loop onmouseover="this.play()" onmouseout="this.pause()"></video>`
-            : `<img src="${m}" alt="${p.titre}">`}
+          ${tag}
+          ${renduMedia(m, p.titre)}
         </div>
         <div class="infos"><h3>${p.titre}</h3><span class="date">${p.date || ""}</span></div>
       </div>`;
@@ -368,11 +392,7 @@
   function ouvrir(i) {
     const p = projets[i];
     const galerie = medias(p).map(m => `
-      <div class="lb-item">
-        ${estVideo(m)
-          ? `<video src="${m}" controls loop></video>`
-          : `<img src="${m}" alt="${p.titre}">`}
-      </div>`).join("");
+      <div class="lb-item">${renduMedia(m, p.titre, true)}</div>`).join("");
     document.getElementById("lb-contenu").innerHTML = `
       <div class="lb-media">${galerie}</div>
       <div class="lb-texte">
