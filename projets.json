@@ -20,6 +20,16 @@
         "/images/uploads/capture-d-écran-2026-11-06-141203.png",
         "https://youtu.be/_gIvxJRznMM"
       ]
+    },
+    {
+      "medias": [
+        "/images/uploads/capture-d-écran-2026-11-07-001214.png",
+        "/images/uploads/capture-d-écran-2026-11-07-001224.png",
+        "https://youtu.be/BWnKKq_dN0s"
+      ],
+      "titre": "Visite 3d Max MSP",
+      "date": "2025",
+      "description": "Patch de Max MSP réalisé pour un projet de cours, regroupant 3 actions pour 3 personnages différents, toutes indépendantes les unes des autres et surtout, se jouant dans un environnement créé en 3 dimensions."
     }
   ]
 }
