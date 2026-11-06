@@ -183,7 +183,9 @@
   .lb-fermer { position: fixed; top: 24px; right: 40px; z-index: 101; font-size: .75rem; letter-spacing: 3px; color: var(--neon); cursor: none; }
   .lb-fermer:hover { text-shadow: 0 0 12px var(--neon); }
   .lb-contenu { max-width: 1300px; margin: 0 auto; padding: 90px 40px 60px; display: grid; grid-template-columns: 1.6fr 1fr; gap: 50px; align-items: start; }
-  .lb-media img, .lb-media video { width: 100%; max-height: 82vh; object-fit: contain; border: 1px solid var(--ligne); background: #000; }
+  .lb-media { display: flex; flex-direction: column; gap: 24px; }
+  .lb-item img, .lb-item video { width: 100%; height: auto; display: block; border: 1px solid var(--ligne); background: #000; }
+  .lb-texte { position: sticky; top: 90px; }
   .lb-texte .meta { color: var(--neon); font-size: .72rem; letter-spacing: 3px; text-transform: uppercase; }
   .lb-texte h2 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(1.8rem, 3.5vw, 3rem); text-transform: uppercase; line-height: 1; margin: 14px 0 24px; }
   .lb-texte p { color: var(--gris); white-space: pre-line; }
@@ -196,11 +198,12 @@
     section, .hero { padding-left: 20px; padding-right: 20px; }
     .apropos-grille, .lb-contenu { grid-template-columns: 1fr; gap: 30px; }
     .lb-contenu { padding: 80px 20px 40px; }
+    .lb-texte { position: static; }
     footer { flex-direction: column; gap: 10px; }
   }
 </style>
 
-<!-- AJOUT 1 : Netlify Identity -->
+<!-- Netlify Identity -->
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
@@ -329,7 +332,14 @@
 
   // ---------- PROJETS (chargés depuis projets.json) ----------
   let projets = [];
-  const estVideo = f => /\.(mp4|webm|mov)$/i.test(f);
+  const estVideo = f => /\.(mp4|webm|mov)$/i.test(f || "");
+
+  // Liste des médias d'un projet (compatible ancien format "media")
+  function medias(p) {
+    if (Array.isArray(p.medias) && p.medias.length) return p.medias;
+    if (p.media) return [p.media];
+    return [];
+  }
 
   fetch("projets.json")
     .then(r => r.json())
@@ -339,21 +349,32 @@
   function afficher() {
     const g = document.getElementById("grille");
     if (!projets.length) { g.innerHTML = '<p class="message">// aucun projet pour le moment</p>'; return; }
-    g.innerHTML = projets.map((p, i) => `
+    g.innerHTML = projets.map((p, i) => {
+      const m = medias(p)[0] || "";
+      return `
       <div class="projet" onclick="ouvrir(${i})">
         <div class="cadre">
           <span class="coin">N°${String(projets.length - i).padStart(2, "0")}</span>
-          ${estVideo(p.media) ? '<span class="video-tag">VIDÉO</span>' : ""}
-          ${estVideo(p.media) ? `<video src="${p.media}" muted loop onmouseover="this.play()" onmouseout="this.pause()"></video>` : `<img src="${p.media}" alt="${p.titre}">`}
+          ${estVideo(m) ? '<span class="video-tag">VIDÉO</span>' : ""}
+          ${estVideo(m)
+            ? `<video src="${m}" muted loop onmouseover="this.play()" onmouseout="this.pause()"></video>`
+            : `<img src="${m}" alt="${p.titre}">`}
         </div>
         <div class="infos"><h3>${p.titre}</h3><span class="date">${p.date || ""}</span></div>
-      </div>`).join("");
+      </div>`;
+    }).join("");
   }
 
   function ouvrir(i) {
     const p = projets[i];
+    const galerie = medias(p).map(m => `
+      <div class="lb-item">
+        ${estVideo(m)
+          ? `<video src="${m}" controls loop></video>`
+          : `<img src="${m}" alt="${p.titre}">`}
+      </div>`).join("");
     document.getElementById("lb-contenu").innerHTML = `
-      <div class="lb-media">${estVideo(p.media) ? `<video src="${p.media}" controls autoplay loop></video>` : `<img src="${p.media}" alt="${p.titre}">`}</div>
+      <div class="lb-media">${galerie}</div>
       <div class="lb-texte">
         <div class="meta">${p.date || ""}</div>
         <h2>${p.titre}</h2>
@@ -362,6 +383,7 @@
     document.getElementById("lightbox").classList.add("ouvert");
     document.body.style.overflow = "hidden";
   }
+
   function fermerProjet() {
     document.getElementById("lightbox").classList.remove("ouvert");
     document.getElementById("lb-contenu").innerHTML = "";
@@ -370,7 +392,7 @@
   document.addEventListener("keydown", e => { if (e.key === "Escape") fermerProjet(); });
 </script>
 
-<!-- AJOUT 2 : redirection après connexion -->
+<!-- Redirection après connexion -->
 <script>
   if (window.netlifyIdentity) {
     window.netlifyIdentity.on("init", user => {
