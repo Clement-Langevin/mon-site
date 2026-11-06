@@ -8,16 +8,16 @@ public_folder: "/images/uploads"
 collections:
   - name: "projets"
     label: "Projets"
-    files:
-      - file: "projets.json"
-        label: "Liste des projets"
-        name: "liste"
+    file: "projets.json"
+    fields:
+      - label: "Projets"
+        name: "projets"
+        widget: "list"
         fields:
-          - label: "Projets"
-            name: "projets"
+          - { label: "Titre", name: "titre", widget: "string" }
+          - { label: "Date", name: "date", widget: "string" }
+          - { label: "Description", name: "description", widget: "text" }
+          - label: "Médias (photos / vidéos)"
+            name: "medias"
             widget: "list"
-            fields:
-              - { label: "Titre", name: "titre", widget: "string" }
-              - { label: "Date", name: "date", widget: "string", hint: "Ex : Mars 2026" }
-              - { label: "Média (photo ou vidéo)", name: "media", widget: "file" }
-              - { label: "Description", name: "description", widget: "text", required: false }
+            field: { label: "Fichier", name: "fichier", widget: "file" }
