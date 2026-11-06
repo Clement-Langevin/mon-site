@@ -111,20 +111,18 @@
     pointer-events: none; z-index: 1; overflow: hidden;
   }
   .flash {
-    position: absolute; width: 220px; aspect-ratio: 4/5; object-fit: cover;
+    position: absolute; width: 260px; aspect-ratio: 4/5; object-fit: cover;
     border: 1px solid var(--neon); opacity: 0;
     filter: saturate(1.4) contrast(1.15);
     box-shadow: 0 0 30px rgba(0,240,255,.35);
-    animation: flash-anim 3.2s ease-in-out forwards;
+    animation: flash-anim 0.9s steps(4) forwards;
   }
   @keyframes flash-anim {
-    0%   { opacity: 0; transform: scale(.96); }
-    8%   { opacity: .9; transform: scale(1); }
-    12%  { opacity: .3; }
-    16%  { opacity: .9; }
-    22%  { opacity: .9; }
-    30%  { opacity: 0; transform: scale(1.02); }
-    100% { opacity: 0; }
+    0%   { opacity: 0; transform: translate(0,0) scale(.96); }
+    15%  { opacity: 1; transform: translate(-4px,2px) scale(1); }
+    30%  { opacity: .4; transform: translate(5px,-3px) scale(1); }
+    45%  { opacity: 1; transform: translate(0,0) scale(1); }
+    100% { opacity: 0; transform: translate(0,0) scale(1.02); }
   }
 
   /* ---------- SECTIONS ---------- */
@@ -250,7 +248,7 @@
   <div class="hero-contenu">
     <div class="tag">Créateur numérique</div>
     <h1 class="glitch" data-texte="Clément Langevin">Clément Langevin</h1>
-    <p class="intro">Actuellement en Master de création contemporaine et nouvelle technologie, je porte mon sujet de mémoire sur l'hybridation du corps et du numérique, le tout axé sur la question de l'angoisse et du malaise. J'effectue également plusieurs projets de création variés pour améliorer mes connaissances de logiciels.</p>
+    <p class="intro">Texte de présentation provisoire. J'explore les frontières entre le code, l'image et la perception. Des projets numériques nés de pixels, de bruit et de lumière.</p>
     <a href="#projets" class="btn-lien">Explorer les projets</a>
   </div>
   <div class="defilement">SCROLL ↓</div>
@@ -266,25 +264,27 @@
 <section id="apropos">
   <div class="entete"><h2>À propos</h2><span class="num">02 / PROFIL</span></div>
   <div class="apropos-grille">
-    <div class="gauche">Créateur multi-support, <em>entre chaire</em> et numérique.</div>
+    <div class="gauche">Créateur numérique, <em>entre code</em> et esthétique.</div>
     <div>
       <details open>
         <summary>Biographie</summary>
-        <p>Actuellement en Master de création contemporaine et nouvelle technologie, je porte mon sujet de mémoire sur l'hybridation du corps et du numérique, le tout axé sur la question de l'angoisse et du malaise. J'effectue également plusieurs projets de création variés pour améliorer mes connaissances de logiciels</p>
+        <p>Clément Langevin crée des projets numériques à la croisée du code et de l'image. (Texte provisoire.)</p>
       </details>
       <details>
         <summary>Démarche</summary>
-        <p>Je m'intéresse à la fusion de la sculpture robotique organique et au numérique pour créer de nouveaux types de corps hybrides. Je travaille également sur la question de l'angoisse et de la mise à mal du corps</p>
+        <p>Je m'intéresse aux systèmes, aux glitchs et à la poésie des erreurs numériques. (Texte provisoire.)</p>
       </details>
       <details>
         <summary>Expositions</summary>
         <ul>
-          <li>2026 — Eclectisme, Saint-Etienne</li>
+          <li>2026 — Exposition personnelle, Galerie exemple, Paris</li>
+          <li>2025 — Festival d'art numérique, Ville exemple</li>
+          <li>2024 — Exposition collective, Lieu exemple</li>
         </ul>
       </details>
       <details>
         <summary>Outils</summary>
-        <p>TouchDesigner · Blender · Unity · Photoshop · After Effects · Max MSP · Latex · Arduino · Arduino</p>
+        <p>TouchDesigner · Blender · p5.js · Processing · After Effects · Python</p>
       </details>
     </div>
   </div>
@@ -292,13 +292,13 @@
 
 <!-- CONTACT -->
 <section id="contact">
-  <div class="gros">Vous pouvez<br>me <span>contacter</span></div>
-  <a class="mail" href="mailto:clement.langevin73@gmail.com">clement.langevin73@gmail.com</a>
+  <div class="gros">Créons quelque chose<br>de <span>nouveau</span></div>
+  <a class="mail" href="mailto:contact@exemple.com">contact@exemple.com</a>
 </section>
 
 <footer>
   <span>© 2026 CLÉMENT LANGEVIN</span>
-  <a href="/admin/">[ ACCÈS PERSO ]</a>
+  <a href="/admin/">[ ACCÈS ARTISTE ]</a>
 </footer>
 
 <!-- FENÊTRE PROJET -->
@@ -443,7 +443,7 @@
     flashsLances = true;
 
     function flashAleatoire() {
-      // uniquement les images (ni vidéos fichiers, ni YouTube)
+      // on ne garde que les images (ni vidéos fichiers, ni YouTube)
       const images = projets
         .map(p => medias(p)[0])
         .filter(m => m && !estVideo(m) && !estYoutube(m));
@@ -453,25 +453,13 @@
         const img = document.createElement("img");
         img.src = src;
         img.className = "flash";
-
-        // taille de la vignette et de la zone disponible
-        const w = zone.clientWidth;
-        const h = zone.clientHeight;
-        const vw = 220;
-        const vh = vw * 5 / 4;
-
-        // position : toujours entièrement visible dans la zone
-        const left = Math.random() * Math.max(0, w - vw - 20) + 10;
-        const top = Math.random() * Math.max(0, h - vh - 20) + 10;
-
-        img.style.left = left + "px";
-        img.style.top = top + "px";
-        img.style.transform = `rotate(${(Math.random() - .5) * 6}deg)`;
+        img.style.left = (Math.random() * 60) + "%";
+        img.style.top = (Math.random() * 70) + "%";
+        img.style.transform = `rotate(${(Math.random() - .5) * 10}deg)`;
         zone.appendChild(img);
-        setTimeout(() => img.remove(), 3200);
+        setTimeout(() => img.remove(), 950);
       }
-      // un nouveau spawn toutes les 2 à 5 secondes
-      setTimeout(flashAleatoire, 2000 + Math.random() * 3000);
+      setTimeout(flashAleatoire, 300 + Math.random() * 900);
     }
     flashAleatoire();
   }
