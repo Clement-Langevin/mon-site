@@ -373,15 +373,17 @@
   }
 
   // Rend un média : YouTube, vidéo fichier ou image
-  function renduMedia(m, titre, controles = false) {
+  // posX / posY : position du cadrage en % (0 à 100), 50 = centre
+  function renduMedia(m, titre, controles = false, posX = 50, posY = 50) {
+    const pos = `object-position: ${posX}% ${posY}%;`;
     if (estYoutube(m)) {
       return `<iframe src="${urlYoutube(m)}" allowfullscreen></iframe>`;
     }
     if (estVideo(m)) {
-      return `<video src="${m}" ${controles ? "controls" : "muted loop"}
+      return `<video src="${m}" style="${pos}" ${controles ? "controls" : "muted loop"}
               ${controles ? "" : 'onmouseover="this.play()" onmouseout="this.pause()"'}></video>`;
     }
-    return `<img src="${m}" alt="${titre}">`;
+    return `<img src="${m}" alt="${titre}" style="${pos}">`;
   }
 
   fetch("projets.json")
@@ -402,7 +404,7 @@
         <div class="cadre">
           <span class="coin">N°${String(projets.length - i).padStart(2, "0")}</span>
           ${tag}
-          ${renduMedia(m, p.titre)}
+          ${renduMedia(m, p.titre, false, p.posX ?? 50, p.posY ?? 50)}
         </div>
         <div class="infos"><h3>${p.titre}</h3><span class="date">${p.date || ""}</span></div>
       </div>`;
@@ -412,7 +414,7 @@
   function ouvrir(i) {
     const p = projets[i];
     const galerie = medias(p).map(m => `
-      <div class="lb-item">${renduMedia(m, p.titre, true)}</div>`).join("");
+      <div class="lb-item">${renduMedia(m, p.titre, true, p.posX ?? 50, p.posY ?? 50)}</div>`).join("");
     document.getElementById("lb-contenu").innerHTML = `
       <div class="lb-media">${galerie}</div>
       <div class="lb-texte">
