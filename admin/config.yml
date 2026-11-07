@@ -27,3 +27,17 @@ collections:
                 name: "medias"
                 widget: "list"
                 field: { label: "Fichier", name: "fichier", widget: "file" }
+              - label: "Position horizontale (%)"
+                name: "posX"
+                widget: "number"
+                default: 50
+                min: 0
+                max: 100
+                hint: "0 = gauche, 50 = centre, 100 = droite"
+              - label: "Position verticale (%)"
+                name: "posY"
+                widget: "number"
+                default: 50
+                min: 0
+                max: 100
+                hint: "0 = haut, 50 = centre, 100 = bas"
