@@ -424,13 +424,29 @@
       </div>`;
     document.getElementById("lightbox").classList.add("ouvert");
     document.body.style.overflow = "hidden";
+    // Ajoute une entrée d'historique : le bouton retour fermera la fenêtre
+    history.pushState({ projet: true }, "");
   }
 
+  // Ferme la fenêtre (bouton ✕ et Échap)
   function fermerProjet() {
+    if (!document.getElementById("lightbox").classList.contains("ouvert")) return;
     document.getElementById("lightbox").classList.remove("ouvert");
     document.getElementById("lb-contenu").innerHTML = "";
     document.body.style.overflow = "";
+    // Retire l'entrée d'historique ajoutée à l'ouverture
+    if (history.state && history.state.projet) history.back();
   }
+
+  // Bouton retour du navigateur / geste retour mobile : ferme la fenêtre au lieu de quitter
+  window.addEventListener("popstate", () => {
+    if (document.getElementById("lightbox").classList.contains("ouvert")) {
+      document.getElementById("lightbox").classList.remove("ouvert");
+      document.getElementById("lb-contenu").innerHTML = "";
+      document.body.style.overflow = "";
+    }
+  });
+
   document.addEventListener("keydown", e => { if (e.key === "Escape") fermerProjet(); });
 </script>
 
