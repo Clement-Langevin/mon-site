@@ -36,14 +36,6 @@
       "description": "Patch de Max MSP réalisé pour un projet de cours, regroupant 3 actions pour 3 personnages différents, toutes indépendantes les unes des autres et surtout, se jouant dans un environnement créé en 3 dimensions.",
       "posX": 0,
       "posY": 50
-    },
-    {
-      "posX": 50,
-      "posY": 50,
-      "titre": "photo",
-      "medias": [
-        "/images/uploads/pierre.png"
-      ]
     }
   ]
 }
