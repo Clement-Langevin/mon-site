@@ -163,6 +163,23 @@
   details ul { list-style: none; }
   details li::before { content: "› "; color: var(--neon2); }
 
+  /* ---------- OUTILS (logos) ---------- */
+  .outils-grille {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 18px; margin-top: 14px;
+  }
+  .outil {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    padding: 14px 8px; border: 1px solid var(--ligne); background: var(--bg);
+    transition: border-color .3s, box-shadow .3s;
+  }
+  .outil:hover { border-color: var(--neon); box-shadow: 0 0 20px rgba(0,240,255,.25); }
+  .outil img {
+    width: 44px; height: 44px; object-fit: contain; display: block;
+    background: #1a1a24; border-radius: 6px;
+  }
+  .outil span { font-size: .62rem; color: var(--gris); letter-spacing: 1px; text-align: center; }
+
   /* ---------- CONTACT ---------- */
   #contact { text-align: center; }
   #contact .gros {
@@ -283,7 +300,15 @@
       </details>
       <details>
         <summary>Outils</summary>
-        <p>TouchDesigner · Blender · Unity · Photoshop · After Effects · Max MSP · Latex · Arduino</p>
+        <div class="outils-grille">
+          <div class="outil"><img src="logos/touchdesigner.png" alt="TouchDesigner"><span>TouchDesigner</span></div>
+          <div class="outil"><img src="logos/blender.png" alt="Blender"><span>Blender</span></div>
+          <div class="outil"><img src="logos/unity.png" alt="Unity"><span>Unity</span></div>
+          <div class="outil"><img src="logos/photoshop.png" alt="Photoshop"><span>Photoshop</span></div>
+          <div class="outil"><img src="logos/after-effects.png" alt="After Effects"><span>After Effects</span></div>
+          <div class="outil"><img src="logos/max-msp.png" alt="Max MSP"><span>Max MSP</span></div>
+          <div class="outil"><img src="logos/arduino.png" alt="Arduino"><span>Arduino</span></div>
+        </div>
       </details>
     </div>
   </div>
